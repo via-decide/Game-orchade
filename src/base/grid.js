@@ -1,3 +1,4 @@
+import { BUILDINGS, getBuildingLevel, getUpgradeCost } from "./buildings.js";
 import { BUILDINGS } from "./buildings.js";
 
 export class BaseGrid {
@@ -10,6 +11,13 @@ export class BaseGrid {
 
   normalizeMatrix(matrix) {
     return Array.from({ length: this.size }, (_, y) =>
+      Array.from({ length: this.size }, (_, x) => {
+        const cell = matrix?.[y]?.[x] ?? null;
+        if (!cell) return null;
+        const schema = BUILDINGS[cell.type];
+        if (!schema) return null;
+        return { type: schema.type, level: getBuildingLevel(cell) };
+      }),
       Array.from({ length: this.size }, (_, x) => matrix?.[y]?.[x] ?? null),
     );
   }
@@ -37,9 +45,34 @@ export class BaseGrid {
     if (!this.wallet.spendAether(schema.cost))
       return { ok: false, message: `Need ${schema.cost} Aether.` };
 
+    this.matrix[y][x] = { type: schema.type, level: schema.level };
     this.matrix[y][x] = { type: schema.type };
     this.onChange(this.matrix);
     return { ok: true, message: `${schema.name} built.` };
+  }
+
+  upgradeBuilding(x, y) {
+    if (!this.isInBounds(x, y))
+      return {
+        ok: false,
+        message: "Upgrade location is outside the base grid.",
+      };
+    const building = this.matrix[y][x];
+    const schema = BUILDINGS[building?.type];
+    if (!building || !schema)
+      return { ok: false, message: "No building to upgrade." };
+
+    const currentLevel = getBuildingLevel(building);
+    const cost = getUpgradeCost(building.type, currentLevel);
+    if (!this.wallet.spendAether(cost))
+      return { ok: false, message: `Need ${cost} Aether.` };
+
+    building.level = currentLevel + 1;
+    this.onChange(this.matrix);
+    return {
+      ok: true,
+      message: `${schema.name} upgraded to Lv.${building.level}.`,
+    };
   }
 
   isInBounds(x, y) {

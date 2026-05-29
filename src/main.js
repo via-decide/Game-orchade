@@ -52,6 +52,11 @@ window.addEventListener("DOMContentLoaded", () => {
       hud.setLog(result.message);
       gameLoop.notify("raid");
     },
+    onUpgradeBuilding: (x, y) => {
+      const result = grid.upgradeBuilding(x, y);
+      hud.setLog(result.message);
+      gameLoop.notify("upgrade");
+    },
     onWipeSave: () => {
       wipeSave();
       wallet.setAether(0);

@@ -1,3 +1,9 @@
+import {
+  BUILDINGS,
+  getBuildingLevel,
+  getProductionRate,
+  getUpgradeCost,
+} from "../src/base/buildings.js";
 import { BUILDINGS } from "../src/base/buildings.js";
 import { UNITS } from "../src/units/factory.js";
 
@@ -11,6 +17,7 @@ export class HudManager {
     onTrainAirship,
     onRaidClouds,
     onWipeSave,
+    onUpgradeBuilding,
   }) {
     this.wallet = wallet;
     this.grid = grid;
@@ -20,6 +27,8 @@ export class HudManager {
     this.onTrainAirship = onTrainAirship;
     this.onRaidClouds = onRaidClouds;
     this.onWipeSave = onWipeSave;
+    this.onUpgradeBuilding = onUpgradeBuilding;
+    this.selectedCell = null;
     this.nodes = this.getNodes();
     this.bindEvents();
   }
@@ -35,6 +44,12 @@ export class HudManager {
       trainAirship: document.getElementById("train-airship-btn"),
       raidClouds: document.getElementById("raid-clouds-btn"),
       wipeSave: document.getElementById("wipe-save-btn"),
+      modal: document.getElementById("building-modal"),
+      modalName: document.getElementById("modal-building-name"),
+      modalLevel: document.getElementById("modal-building-level"),
+      modalProduction: document.getElementById("modal-building-production"),
+      upgradeBuilding: document.getElementById("upgrade-building-btn"),
+      closeModal: document.getElementById("close-building-modal-btn"),
     };
   }
 
@@ -43,6 +58,11 @@ export class HudManager {
     this.nodes.trainAirship?.addEventListener("click", this.onTrainAirship);
     this.nodes.raidClouds?.addEventListener("click", this.onRaidClouds);
     this.nodes.wipeSave?.addEventListener("click", this.onWipeSave);
+    this.nodes.closeModal?.addEventListener("click", () => this.closeModal());
+    this.nodes.upgradeBuilding?.addEventListener("click", () => {
+      if (!this.selectedCell) return;
+      this.onUpgradeBuilding(this.selectedCell.x, this.selectedCell.y);
+    });
   }
 
   render() {
@@ -58,11 +78,67 @@ export class HudManager {
     this.nodes.raidClouds.disabled =
       this.combat.raidInProgress || this.unitFactory.getFleetCount() < 1;
     this.renderGrid();
+    this.renderModal();
   }
 
   renderGrid() {
     const gridNode = this.nodes.grid;
     gridNode.innerHTML = "";
+    this.grid.matrix.forEach((row, y) => {
+      row.forEach((cell, x) => {
+        const slot = document.createElement("button");
+        const schema = BUILDINGS[cell?.type];
+        slot.className = "grid-cell";
+        slot.type = "button";
+        slot.dataset.x = String(x);
+        slot.dataset.y = String(y);
+        slot.setAttribute(
+          "aria-label",
+          schema
+            ? `${schema.name} level ${getBuildingLevel(cell)}`
+            : `Empty slot ${y * this.grid.size + x + 1}`,
+        );
+        if (schema) {
+          slot.classList.add("occupied");
+          slot.addEventListener("click", () => this.openModal(x, y));
+          slot.innerHTML = `<span class="building-icon">${schema.icon}</span><span class="building-level">Lv.${getBuildingLevel(cell)}</span>`;
+        }
+        gridNode.appendChild(slot);
+      });
+    });
+  }
+
+  openModal(x, y) {
+    this.selectedCell = { x, y };
+    this.nodes.modal.hidden = false;
+    this.renderModal();
+  }
+
+  closeModal() {
+    this.selectedCell = null;
+    this.nodes.modal.hidden = true;
+  }
+
+  renderModal() {
+    if (!this.selectedCell || this.nodes.modal.hidden) return;
+    const { x, y } = this.selectedCell;
+    const building = this.grid.matrix[y]?.[x];
+    const schema = BUILDINGS[building?.type];
+    if (!building || !schema) {
+      this.closeModal();
+      return;
+    }
+
+    const level = getBuildingLevel(building);
+    const nextLevel = level + 1;
+    const upgradeCost = getUpgradeCost(building.type, level);
+    this.nodes.modalName.textContent = schema.name;
+    this.nodes.modalLevel.textContent = `Current Level: Lv.${level}`;
+    this.nodes.modalProduction.textContent = `Production: ${getProductionRate(building.type, level)} → ${getProductionRate(building.type, nextLevel)} Aether/tick`;
+    this.nodes.upgradeBuilding.textContent = `Upgrade (Cost: ${upgradeCost} Aether)`;
+    this.nodes.upgradeBuilding.disabled = !this.wallet.canAfford(upgradeCost);
+  }
+
     this.grid.matrix.flat().forEach((cell, index) => {
       const slot = document.createElement("button");
       slot.className = "grid-cell";

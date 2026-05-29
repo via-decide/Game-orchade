@@ -6,6 +6,7 @@ export function saveGame({ wallet, grid, unitFactory }) {
       version: 1,
       savedAt: Date.now(),
       wallet: { aether: wallet?.aether ?? 0 },
+      grid: { matrix: serializeGridMatrix(grid?.matrix) },
       grid: { matrix: grid?.matrix ?? [] },
       fleet: { count: unitFactory?.getFleetCount?.() ?? 0 },
     };
@@ -38,6 +39,22 @@ export function wipeSave() {
   } catch {
     return false;
   }
+}
+
+function serializeGridMatrix(matrix) {
+  if (!Array.isArray(matrix)) return [];
+  return matrix.map((row) =>
+    Array.isArray(row)
+      ? row.map((cell) =>
+          cell
+            ? {
+                type: cell.type,
+                level: Math.max(1, Math.floor(Number(cell.level) || 1)),
+              }
+            : null,
+        )
+      : [],
+  );
 }
 
 function createDefaultSave() {

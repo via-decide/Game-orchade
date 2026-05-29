@@ -50,6 +50,54 @@
         ></div>
       </section>
 
+      <section
+        id="building-modal"
+        class="building-modal"
+        aria-label="Building upgrade panel"
+        aria-live="polite"
+        hidden
+      >
+        <div class="modal-card">
+          <h2 id="modal-building-name">Building</h2>
+          <p id="modal-building-level">Level 1</p>
+          <p id="modal-building-production">Production: 0 → 0 Aether/tick</p>
+          <div class="modal-actions">
+            <button id="upgrade-building-btn" class="btn primary" type="button">
+              Upgrade
+            </button>
+            <button
+              id="close-building-modal-btn"
+              class="btn ghost"
+              type="button"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <section class="status-panel" aria-live="polite">
+        <p id="production-queue">Production queue: idle</p>
+        <p id="combat-log">
+          Generate Aether, build 🏭, train 🛩️, then raid the ☁️.
+        </p>
+      </section>
+
+      <section class="grid-shell" aria-label="Base grid">
+        <div
+          id="base-grid"
+          class="base-grid"
+          role="grid"
+          aria-label="10 by 10 base build grid"
+        ></div>
+      </section>
+
+      <section class="debug-panel" aria-label="Debug controls">
+        <button id="wipe-save-btn" class="btn ghost" type="button">
+          Wipe Save
+        </button>
+      </section>
+
       <section class="debug-panel" aria-label="Debug controls">
         <button id="wipe-save-btn" class="btn ghost" type="button">
           Wipe Save
