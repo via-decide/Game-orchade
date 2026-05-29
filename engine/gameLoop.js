@@ -68,7 +68,7 @@ export class GameLoop {
       reason,
       tickCount: this.tickCount,
       elapsedTicks: this.lastElapsedTicks ?? 1,
-      aether: this.wallet?.aether ?? 0,
+      aether: this.wallet?.getBalance?.("aether") ?? 0,
     };
   }
 
@@ -95,7 +95,7 @@ export class GameLoop {
 
     this.lastElapsedTicks = elapsedTicks;
     this.tickCount += elapsedTicks;
-    this.wallet?.addAether(productionRate * elapsedTicks);
+    this.wallet?.add("aether", productionRate * elapsedTicks);
     this.notify("tick");
     if (
       this.onAutoSave &&

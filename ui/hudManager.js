@@ -9,6 +9,7 @@ import { UNITS } from "../src/units/factory.js";
 export class HudManager {
   constructor({
     wallet,
+    profile,
     grid,
     unitFactory,
     combat,
@@ -19,6 +20,7 @@ export class HudManager {
     onUpgradeBuilding,
   }) {
     this.wallet = wallet;
+    this.profile = profile;
     this.grid = grid;
     this.unitFactory = unitFactory;
     this.combat = combat;
@@ -30,11 +32,14 @@ export class HudManager {
     this.selectedCell = null;
     this.nodes = this.getNodes();
     this.bindEvents();
+    this.bindProfileEvents();
   }
 
   getNodes() {
     return {
       aether: document.getElementById("aether-balance"),
+      chronium: document.getElementById("chronium-balance"),
+      playerLevel: document.getElementById("player-level"),
       fleet: document.getElementById("fleet-count"),
       queue: document.getElementById("production-queue"),
       grid: document.getElementById("base-grid"),
@@ -70,14 +75,25 @@ export class HudManager {
     });
   }
 
+  bindProfileEvents() {
+    if (typeof window === "undefined") return;
+    window.addEventListener("player-profile-level-up", () => this.render());
+  }
+
   render() {
-    this.nodes.aether.textContent = String(this.wallet.aether);
+    this.nodes.aether.textContent = String(this.wallet.getBalance("aether"));
+    this.nodes.chronium.textContent = String(
+      this.wallet.getBalance("chronium"),
+    );
+    this.nodes.playerLevel.textContent = `Lv.${this.profile?.level ?? 1}`;
     this.nodes.fleet.textContent = `${UNITS.corsairAirship.icon} ${this.unitFactory.getFleetCount()}`;
     this.nodes.queue.textContent = this.formatQueue();
-    this.nodes.buildRefinery.disabled = !this.wallet.canAfford(
+    this.nodes.buildRefinery.disabled = !this.wallet.hasEnough(
+      "aether",
       BUILDINGS.refinery.cost,
     );
-    this.nodes.trainAirship.disabled = !this.wallet.canAfford(
+    this.nodes.trainAirship.disabled = !this.wallet.hasEnough(
+      "aether",
       UNITS.corsairAirship.cost,
     );
     this.nodes.raidClouds.disabled =
@@ -141,7 +157,10 @@ export class HudManager {
     this.nodes.modalLevel.textContent = `Current Level: Lv.${level}`;
     this.nodes.modalProduction.textContent = `Production: ${getProductionRate(building.type, level)} → ${getProductionRate(building.type, nextLevel)} Aether/tick`;
     this.nodes.upgradeBuilding.textContent = `Upgrade (Cost: ${upgradeCost} Aether)`;
-    this.nodes.upgradeBuilding.disabled = !this.wallet.canAfford(upgradeCost);
+    this.nodes.upgradeBuilding.disabled = !this.wallet.hasEnough(
+      "aether",
+      upgradeCost,
+    );
   }
 
   showOfflineProgress(aether) {
