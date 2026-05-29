@@ -135,7 +135,19 @@ body {
   padding: 0.35rem;
   border: 2px solid rgba(102, 224, 255, 0.32);
   border-radius: 1rem;
-  background: rgba(5, 12, 24, 0.76);
+  background:
+    linear-gradient(rgba(5, 12, 24, 0.76), rgba(5, 12, 24, 0.76)),
+    repeating-linear-gradient(
+      90deg,
+      transparent 0 calc(10% - 0.18rem),
+      rgba(102, 224, 255, 0.22) calc(10% - 0.18rem) 10%
+    ),
+    repeating-linear-gradient(
+      0deg,
+      transparent 0 calc(10% - 0.18rem),
+      rgba(102, 224, 255, 0.22) calc(10% - 0.18rem) 10%
+    );
+  background-blend-mode: normal, screen, screen;
 }
 
 .grid-cell {
