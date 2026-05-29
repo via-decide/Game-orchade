@@ -7,6 +7,16 @@ export function initBaseEditor({
   onMove,
   onEditModeChange,
 }) {
+  if (!gridNode || !toggleButton) {
+    return {
+      clearSelection() {},
+      refreshSelection() {},
+      get isEditMode() {
+        return false;
+      },
+    };
+  }
+
   let isEditMode = false;
   let selectedCell = null;
 
