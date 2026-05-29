@@ -1,4 +1,4 @@
-import { GameLoop } from "../engine/gameLoop.js";
+import { GameLoop, calculateOfflineProgress } from "../engine/gameLoop.js";
 import { saveGame, loadGame, wipeSave } from "../engine/saveSystem.js";
 import { BaseGrid } from "./base/grid.js";
 import { Wallet } from "./economy/wallet.js";
@@ -15,10 +15,15 @@ window.addEventListener("DOMContentLoaded", () => {
     activeFleet: saved.fleet.count,
   });
   const gameState = { wallet, grid, unitFactory };
+  const offlineProgress = calculateOfflineProgress(
+    grid,
+    saved.lastSavedTimestamp,
+  );
+  if (offlineProgress.aether > 0) wallet.addAether(offlineProgress.aether);
   let hud;
 
   const persist = () => saveGame(gameState);
-  const gameLoop = new GameLoop({ wallet, onAutoSave: persist });
+  const gameLoop = new GameLoop({ wallet, grid, onAutoSave: persist });
   const combat = new CombatSimulator({
     wallet,
     unitFactory,
@@ -76,5 +81,9 @@ window.addEventListener("DOMContentLoaded", () => {
   gameLoop.subscribe(() => hud.render());
 
   hud.render();
+  if (offlineProgress.offlineSeconds > 60 && offlineProgress.aether > 0) {
+    hud.showOfflineProgress(offlineProgress.aether);
+  }
+  persist();
   gameLoop.start();
 });

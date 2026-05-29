@@ -4,7 +4,6 @@ import {
   getProductionRate,
   getUpgradeCost,
 } from "../src/base/buildings.js";
-import { BUILDINGS } from "../src/base/buildings.js";
 import { UNITS } from "../src/units/factory.js";
 
 export class HudManager {
@@ -50,6 +49,9 @@ export class HudManager {
       modalProduction: document.getElementById("modal-building-production"),
       upgradeBuilding: document.getElementById("upgrade-building-btn"),
       closeModal: document.getElementById("close-building-modal-btn"),
+      offlineModal: document.getElementById("offline-modal"),
+      offlineMessage: document.getElementById("offline-modal-message"),
+      closeOfflineModal: document.getElementById("close-offline-modal-btn"),
     };
   }
 
@@ -59,6 +61,9 @@ export class HudManager {
     this.nodes.raidClouds?.addEventListener("click", this.onRaidClouds);
     this.nodes.wipeSave?.addEventListener("click", this.onWipeSave);
     this.nodes.closeModal?.addEventListener("click", () => this.closeModal());
+    this.nodes.closeOfflineModal?.addEventListener("click", () =>
+      this.closeOfflineModal(),
+    );
     this.nodes.upgradeBuilding?.addEventListener("click", () => {
       if (!this.selectedCell) return;
       this.onUpgradeBuilding(this.selectedCell.x, this.selectedCell.y);
@@ -139,19 +144,14 @@ export class HudManager {
     this.nodes.upgradeBuilding.disabled = !this.wallet.canAfford(upgradeCost);
   }
 
-    this.grid.matrix.flat().forEach((cell, index) => {
-      const slot = document.createElement("button");
-      slot.className = "grid-cell";
-      slot.type = "button";
-      slot.setAttribute(
-        "aria-label",
-        cell
-          ? (BUILDINGS[cell.type]?.name ?? "Building")
-          : `Empty slot ${index + 1}`,
-      );
-      slot.textContent = cell ? (BUILDINGS[cell.type]?.icon ?? "🏭") : "";
-      gridNode.appendChild(slot);
-    });
+  showOfflineProgress(aether) {
+    if (!this.nodes.offlineModal || !this.nodes.offlineMessage) return;
+    this.nodes.offlineMessage.textContent = `Welcome Back! Your Citadel generated ${aether} Aether while you were away.`;
+    this.nodes.offlineModal.hidden = false;
+  }
+
+  closeOfflineModal() {
+    if (this.nodes.offlineModal) this.nodes.offlineModal.hidden = true;
   }
 
   setLog(message) {
