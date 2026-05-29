@@ -2,12 +2,13 @@ const STORAGE_KEY = "zayvora-mvp-save";
 
 export function saveGame({ wallet, grid, unitFactory }) {
   try {
+    const now = Date.now();
     const payload = {
       version: 1,
-      savedAt: Date.now(),
+      savedAt: now,
+      lastSavedTimestamp: now,
       wallet: { aether: wallet?.aether ?? 0 },
       grid: { matrix: serializeGridMatrix(grid?.matrix) },
-      grid: { matrix: grid?.matrix ?? [] },
       fleet: { count: unitFactory?.getFleetCount?.() ?? 0 },
     };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
@@ -23,6 +24,9 @@ export function loadGame() {
     if (!raw) return createDefaultSave();
     const parsed = JSON.parse(raw);
     return {
+      lastSavedTimestamp: normalizeTimestamp(
+        parsed.lastSavedTimestamp ?? parsed.savedAt,
+      ),
       wallet: { aether: Math.max(0, Number(parsed.wallet?.aether) || 0) },
       grid: { matrix: parsed.grid?.matrix ?? null },
       fleet: { count: Math.max(0, Number(parsed.fleet?.count) || 0) },
@@ -57,8 +61,14 @@ function serializeGridMatrix(matrix) {
   );
 }
 
+function normalizeTimestamp(timestamp) {
+  const normalized = Number(timestamp);
+  return Number.isFinite(normalized) && normalized > 0 ? normalized : null;
+}
+
 function createDefaultSave() {
   return {
+    lastSavedTimestamp: null,
     wallet: { aether: 0 },
     grid: { matrix: null },
     fleet: { count: 0 },
