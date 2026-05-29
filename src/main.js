@@ -6,6 +6,7 @@ import { PlayerProfile } from "./player/profile.js";
 import { UnitFactory } from "./units/factory.js";
 import { CombatSimulator } from "./combat/simulator.js";
 import { HudManager } from "../ui/hudManager.js";
+import { initBaseEditor } from "../ui/editor.js";
 
 window.addEventListener("DOMContentLoaded", () => {
   const saved = loadGame();
@@ -23,6 +24,7 @@ window.addEventListener("DOMContentLoaded", () => {
   );
   if (offlineProgress.aether > 0) wallet.add("aether", offlineProgress.aether);
   let hud;
+  let baseEditor;
 
   const persist = () => saveGame(gameState);
   const gameLoop = new GameLoop({ wallet, grid, onAutoSave: persist });
@@ -79,12 +81,27 @@ window.addEventListener("DOMContentLoaded", () => {
     },
   });
 
+  baseEditor = initBaseEditor({
+    grid,
+    gridNode: document.getElementById("base-grid"),
+    toggleButton: document.getElementById("edit-base-toggle-btn"),
+    renderBase: () => hud.render(),
+    setLog: (message) => hud.setLog(message),
+    onMove: () => persist(),
+    onEditModeChange: (editing) => {
+      if (editing) hud.closeModal();
+    },
+  });
+
   grid.setChangeHandler(() => persist());
   unitFactory.setChangeHandler(() => persist());
   gameLoop.subscribe((snapshot) => {
     if (snapshot.reason === "tick") unitFactory.tick();
   });
-  gameLoop.subscribe(() => hud.render());
+  gameLoop.subscribe(() => {
+    hud.render();
+    baseEditor.refreshSelection();
+  });
 
   hud.render();
   if (offlineProgress.offlineSeconds > 60 && offlineProgress.aether > 0) {

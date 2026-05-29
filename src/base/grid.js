@@ -50,6 +50,29 @@ export class BaseGrid {
     return { ok: true, message: `${schema.name} built.` };
   }
 
+  moveBuilding(fromX, fromY, toX, toY) {
+    if (!this.isInBounds(fromX, fromY))
+      return {
+        ok: false,
+        message: "Selected building is outside the base grid.",
+      };
+    if (!this.isInBounds(toX, toY))
+      return {
+        ok: false,
+        message: "Move destination is outside the base grid.",
+      };
+
+    const building = this.matrix[fromY][fromX];
+    if (!building) return { ok: false, message: "No building to move." };
+    if (this.matrix[toY][toX])
+      return { ok: false, message: "Move destination is occupied." };
+
+    this.matrix[toY][toX] = building;
+    this.matrix[fromY][fromX] = null;
+    this.onChange(this.matrix);
+    return { ok: true, message: "Building moved." };
+  }
+
   upgradeBuilding(x, y) {
     if (!this.isInBounds(x, y))
       return {
