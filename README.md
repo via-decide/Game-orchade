@@ -8,12 +8,12 @@ Zayvora is planned as an original mobile-first strategy/base-builder about estab
 
 ## Current Tech Stack
 
-- Vanilla JavaScript ES modules running directly in the browser from `index.html` and `game.js`.
+- Vanilla JavaScript ES modules running directly in the browser from `index.html` and `src/main.js`.
 - HTML canvas rendering through the custom engine modules under `engine/`.
 - Plain CSS in `style.css`; no framework, bundler, or generated build output is required for runtime.
 - Local browser persistence through `src/save/saveManager.js`.
 - Current gameplay scaffolding includes a tile world, player entity, farming interaction, score HUD, overlays, asset loader, physics/input/render/effects/debug engine modules, and launcher metadata in `mars.json` / `metadata.json`.
-- `package.json` currently declares Puppeteer as a development/smoke-test dependency, but there are no npm scripts and the game itself does not require npm to run.
+- `package.json` declares Puppeteer for smoke testing and provides `npm test`; the game itself does not require npm or a build step to run.
 
 ## Setup Instructions
 
@@ -27,6 +27,13 @@ Zayvora is planned as an original mobile-first strategy/base-builder about estab
 3. Open `http://localhost:8000` in a modern browser.
 4. For a quick direct check, open `index.html`; if module loading is blocked by the browser, use the static server above.
 5. Keep deployment static: no build command, no output directory, and no generated assets are required.
+
+
+## GitHub Pages Deployment
+
+The current UI is the Zayvora static app served from `index.html`, `style.css`, and `src/main.js`. If the public GitHub Pages URL still shows an older title such as “Data Orchard” or the Pages settings page says the last deployment was months ago, the live site has not been redeployed from this repository state yet.
+
+This repository includes `.github/workflows/pages.yml`, which publishes the repository root to GitHub Pages whenever `main` is pushed and can also be run manually from the Actions tab. In repository settings, set **Pages → Build and deployment → Source** to **GitHub Actions** so this workflow is the deployment source. After the workflow finishes successfully, hard-refresh the mobile browser tab to clear any cached HTML.
 
 ## Development Roadmap
 
