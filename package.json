@@ -1,5 +1,11 @@
 {
   "dependencies": {
     "puppeteer": "^24.42.0"
-  }
+  },
+  "scripts": {
+    "start": "python3 -m http.server 8000",
+    "lint": "npx --yes prettier --check package.json package-lock.json test_logs.js tests/engine.test.js src/auth.js",
+    "test": "npm run lint && node test_logs.js"
+  },
+  "type": "module"
 }
