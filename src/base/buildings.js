@@ -29,3 +29,6 @@ export function getProductionRate(type, level = 1) {
   if (!schema) return 0;
   return schema.baseProduction * getBuildingLevel({ level });
 }
+    icon: "🏭",
+  },
+};

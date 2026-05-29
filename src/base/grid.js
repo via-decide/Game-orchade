@@ -1,4 +1,5 @@
 import { BUILDINGS, getBuildingLevel, getUpgradeCost } from "./buildings.js";
+import { BUILDINGS } from "./buildings.js";
 
 export class BaseGrid {
   constructor({ wallet, size = 10, matrix } = {}) {
@@ -17,6 +18,7 @@ export class BaseGrid {
         if (!schema) return null;
         return { type: schema.type, level: getBuildingLevel(cell) };
       }),
+      Array.from({ length: this.size }, (_, x) => matrix?.[y]?.[x] ?? null),
     );
   }
 
@@ -44,6 +46,7 @@ export class BaseGrid {
       return { ok: false, message: `Need ${schema.cost} Aether.` };
 
     this.matrix[y][x] = { type: schema.type, level: schema.level };
+    this.matrix[y][x] = { type: schema.type };
     this.onChange(this.matrix);
     return { ok: true, message: `${schema.name} built.` };
   }

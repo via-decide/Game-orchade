@@ -7,6 +7,7 @@ export function saveGame({ wallet, grid, unitFactory }) {
       savedAt: Date.now(),
       wallet: { aether: wallet?.aether ?? 0 },
       grid: { matrix: serializeGridMatrix(grid?.matrix) },
+      grid: { matrix: grid?.matrix ?? [] },
       fleet: { count: unitFactory?.getFleetCount?.() ?? 0 },
     };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));

@@ -4,6 +4,7 @@ import {
   getProductionRate,
   getUpgradeCost,
 } from "../src/base/buildings.js";
+import { BUILDINGS } from "../src/base/buildings.js";
 import { UNITS } from "../src/units/factory.js";
 
 export class HudManager {
@@ -136,6 +137,21 @@ export class HudManager {
     this.nodes.modalProduction.textContent = `Production: ${getProductionRate(building.type, level)} → ${getProductionRate(building.type, nextLevel)} Aether/tick`;
     this.nodes.upgradeBuilding.textContent = `Upgrade (Cost: ${upgradeCost} Aether)`;
     this.nodes.upgradeBuilding.disabled = !this.wallet.canAfford(upgradeCost);
+  }
+
+    this.grid.matrix.flat().forEach((cell, index) => {
+      const slot = document.createElement("button");
+      slot.className = "grid-cell";
+      slot.type = "button";
+      slot.setAttribute(
+        "aria-label",
+        cell
+          ? (BUILDINGS[cell.type]?.name ?? "Building")
+          : `Empty slot ${index + 1}`,
+      );
+      slot.textContent = cell ? (BUILDINGS[cell.type]?.icon ?? "🏭") : "";
+      gridNode.appendChild(slot);
+    });
   }
 
   setLog(message) {
