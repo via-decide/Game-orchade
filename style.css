@@ -6,7 +6,11 @@
   --danger: #ff5f7a;
 }
 
-* { box-sizing: border-box; }
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
 
 body {
   margin: 0;
@@ -14,6 +18,7 @@ body {
   background: radial-gradient(circle at top, #1a2442, var(--bg));
   color: var(--text);
   min-height: 100vh;
+  overscroll-behavior: none;
 }
 
 .app-shell {
@@ -21,6 +26,7 @@ body {
   margin: 0 auto;
   padding: 1rem;
   position: relative;
+  touch-action: none;
 }
 
 .hud {
