@@ -2,43 +2,87 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover" />
-    <meta name="description" content="SkillHex Runner - a vanilla JS web game" />
-    <title>SkillHex Runner</title>
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
+    />
+    <meta
+      name="description"
+      content="Zayvora MVP - mobile base-building strategy loop"
+    />
+    <title>Zayvora MVP</title>
     <link rel="stylesheet" href="./style.css" />
   </head>
   <body>
-    <main class="app-shell">
-      <section id="start-screen" class="overlay visible" aria-live="polite">
-        <div class="panel">
-          <h1>SkillHex Runner</h1>
-          <p>Avoid hazards, survive as long as possible, and build your logic score.</p>
-          <button id="start-btn" class="btn primary">Start Game</button>
+    <main class="app-shell" aria-label="Zayvora playable MVP">
+      <section class="top-bar" aria-label="Resource HUD">
+        <div class="hud-card">
+          💰 Aether: <span id="aether-balance">0</span>
+        </div>
+        <div class="hud-card">Fleet: <span id="fleet-count">🛩️ 0</span></div>
+      </section>
+
+      <section class="command-panel" aria-label="Base commands">
+        <button id="build-refinery-btn" class="btn primary" type="button">
+          Build Refinery (50 Aether)
+        </button>
+        <button id="train-airship-btn" class="btn" type="button">
+          Train Airship (100 Aether)
+        </button>
+        <button id="raid-clouds-btn" class="btn danger" type="button">
+          Raid Clouds ☁️
+        </button>
+      </section>
+
+      <section class="status-panel" aria-live="polite">
+        <p id="production-queue">Production queue: idle</p>
+        <p id="combat-log">
+          Generate Aether, build 🏭, train 🛩️, then raid the ☁️.
+        </p>
+      </section>
+
+      <section class="grid-shell" aria-label="Base grid">
+        <div
+          id="base-grid"
+          class="base-grid"
+          role="grid"
+          aria-label="10 by 10 base build grid"
+        ></div>
+      </section>
+
+      <section
+        id="building-modal"
+        class="building-modal"
+        aria-label="Building upgrade panel"
+        aria-live="polite"
+        hidden
+      >
+        <div class="modal-card">
+          <h2 id="modal-building-name">Building</h2>
+          <p id="modal-building-level">Level 1</p>
+          <p id="modal-building-production">Production: 0 → 0 Aether/tick</p>
+          <div class="modal-actions">
+            <button id="upgrade-building-btn" class="btn primary" type="button">
+              Upgrade
+            </button>
+            <button
+              id="close-building-modal-btn"
+              class="btn ghost"
+              type="button"
+            >
+              Close
+            </button>
+          </div>
         </div>
       </section>
 
-      <section class="hud" aria-label="Game HUD">
-        <div class="hud-item">Score: <span id="score">0</span></div>
-        <div class="hud-item">Best: <span id="best-score">0</span></div>
-        <div class="hud-actions">
-          <button id="pause-btn" class="btn">Pause</button>
-          <button id="restart-btn" class="btn">Restart</button>
-        </div>
-      </section>
-
-      <section class="canvas-wrap">
-        <canvas id="game-canvas" width="800" height="500" aria-label="Game canvas"></canvas>
-      </section>
-
-      <section id="end-screen" class="overlay" aria-live="polite">
-        <div class="panel">
-          <h2>Game Over</h2>
-          <p>Your score: <span id="final-score">0</span></p>
-          <button id="play-again-btn" class="btn primary">Play Again</button>
-        </div>
+      <section class="debug-panel" aria-label="Debug controls">
+        <button id="wipe-save-btn" class="btn ghost" type="button">
+          Wipe Save
+        </button>
       </section>
     </main>
 
-    <script type="module" src="./game.js"></script>
+    <script type="module" src="./src/main.js"></script>
   </body>
 </html>
