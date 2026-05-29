@@ -8,4 +8,11 @@
     "test": "npm run lint && node test_logs.js"
   },
   "type": "module"
+    "lint": "npx --yes prettier --check package.json package-lock.json test_logs.js tests/engine.test.js",
+    "test": "npm run lint && node test_logs.js"
+  },
+  "type": "module"
+    "lint": "npx --yes prettier --check package.json package-lock.json",
+    "test": "npm run lint && node --check game.js && find engine src ui -name '*.js' -print0 | xargs -0 -n1 node --check && node --check test_logs.js"
+  }
 }
