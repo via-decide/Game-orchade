@@ -25,7 +25,7 @@ export class CombatSimulator {
     this.onChange("Raid launched into the ☁️...", this.raidInProgress);
 
     setTimeout(() => {
-      this.wallet.addAether(this.reward);
+      this.wallet.add("aether", this.reward);
       this.raidInProgress = false;
       this.onChange(
         `Raid successful! +${this.reward} Aether`,

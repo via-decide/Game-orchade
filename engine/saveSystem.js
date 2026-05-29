@@ -1,13 +1,14 @@
 const STORAGE_KEY = "zayvora-mvp-save";
 
-export function saveGame({ wallet, grid, unitFactory }) {
+export function saveGame({ wallet, profile, grid, unitFactory }) {
   try {
     const now = Date.now();
     const payload = {
       version: 1,
       savedAt: now,
       lastSavedTimestamp: now,
-      wallet: { aether: wallet?.aether ?? 0 },
+      wallet: { balances: normalizeBalances(wallet?.balances) },
+      profile: normalizeProfile(profile),
       grid: { matrix: serializeGridMatrix(grid?.matrix) },
       fleet: { count: unitFactory?.getFleetCount?.() ?? 0 },
     };
@@ -27,7 +28,10 @@ export function loadGame() {
       lastSavedTimestamp: normalizeTimestamp(
         parsed.lastSavedTimestamp ?? parsed.savedAt,
       ),
-      wallet: { aether: Math.max(0, Number(parsed.wallet?.aether) || 0) },
+      wallet: {
+        balances: normalizeBalances(parsed.wallet?.balances ?? parsed.wallet),
+      },
+      profile: normalizeProfile(parsed.profile),
       grid: { matrix: parsed.grid?.matrix ?? null },
       fleet: { count: Math.max(0, Number(parsed.fleet?.count) || 0) },
     };
@@ -43,6 +47,20 @@ export function wipeSave() {
   } catch {
     return false;
   }
+}
+
+function normalizeBalances(balances = {}) {
+  return {
+    aether: Math.max(0, Math.floor(Number(balances?.aether) || 0)),
+    chronium: Math.max(0, Math.floor(Number(balances?.chronium) || 0)),
+  };
+}
+
+function normalizeProfile(profile = {}) {
+  return {
+    level: Math.max(1, Math.floor(Number(profile?.level) || 1)),
+    xp: Math.max(0, Math.floor(Number(profile?.xp) || 0)),
+  };
 }
 
 function serializeGridMatrix(matrix) {
@@ -69,7 +87,8 @@ function normalizeTimestamp(timestamp) {
 function createDefaultSave() {
   return {
     lastSavedTimestamp: null,
-    wallet: { aether: 0 },
+    wallet: { balances: { aether: 0, chronium: 0 } },
+    profile: { level: 1, xp: 0 },
     grid: { matrix: null },
     fleet: { count: 0 },
   };

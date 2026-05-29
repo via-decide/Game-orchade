@@ -1,8 +1,9 @@
 import { BUILDINGS, getBuildingLevel, getUpgradeCost } from "./buildings.js";
 
 export class BaseGrid {
-  constructor({ wallet, size = 10, matrix } = {}) {
+  constructor({ wallet, profile, size = 10, matrix } = {}) {
     this.wallet = wallet;
+    this.profile = profile;
     this.size = size;
     this.matrix = this.normalizeMatrix(matrix);
     this.onChange = () => {};
@@ -40,10 +41,11 @@ export class BaseGrid {
       return { ok: false, message: "Build location is outside the base grid." };
     if (this.matrix[y][x])
       return { ok: false, message: "That grid slot is already occupied." };
-    if (!this.wallet.spendAether(schema.cost))
+    if (!this.wallet.deduct("aether", schema.cost))
       return { ok: false, message: `Need ${schema.cost} Aether.` };
 
     this.matrix[y][x] = { type: schema.type, level: schema.level };
+    this.profile?.addXp(50 * schema.level);
     this.onChange(this.matrix);
     return { ok: true, message: `${schema.name} built.` };
   }
@@ -61,10 +63,11 @@ export class BaseGrid {
 
     const currentLevel = getBuildingLevel(building);
     const cost = getUpgradeCost(building.type, currentLevel);
-    if (!this.wallet.spendAether(cost))
+    if (!this.wallet.deduct("aether", cost))
       return { ok: false, message: `Need ${cost} Aether.` };
 
     building.level = currentLevel + 1;
+    this.profile?.addXp(50 * building.level);
     this.onChange(this.matrix);
     return {
       ok: true,

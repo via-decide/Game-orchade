@@ -2,24 +2,26 @@ import { GameLoop, calculateOfflineProgress } from "../engine/gameLoop.js";
 import { saveGame, loadGame, wipeSave } from "../engine/saveSystem.js";
 import { BaseGrid } from "./base/grid.js";
 import { Wallet } from "./economy/wallet.js";
+import { PlayerProfile } from "./player/profile.js";
 import { UnitFactory } from "./units/factory.js";
 import { CombatSimulator } from "./combat/simulator.js";
 import { HudManager } from "../ui/hudManager.js";
 
 window.addEventListener("DOMContentLoaded", () => {
   const saved = loadGame();
-  const wallet = new Wallet(saved.wallet.aether);
-  const grid = new BaseGrid({ wallet, matrix: saved.grid.matrix });
+  const wallet = new Wallet(saved.wallet.balances);
+  const profile = new PlayerProfile(saved.profile);
+  const grid = new BaseGrid({ wallet, profile, matrix: saved.grid.matrix });
   const unitFactory = new UnitFactory({
     wallet,
     activeFleet: saved.fleet.count,
   });
-  const gameState = { wallet, grid, unitFactory };
+  const gameState = { wallet, profile, grid, unitFactory };
   const offlineProgress = calculateOfflineProgress(
     grid,
     saved.lastSavedTimestamp,
   );
-  if (offlineProgress.aether > 0) wallet.addAether(offlineProgress.aether);
+  if (offlineProgress.aether > 0) wallet.add("aether", offlineProgress.aether);
   let hud;
 
   const persist = () => saveGame(gameState);
@@ -36,6 +38,7 @@ window.addEventListener("DOMContentLoaded", () => {
 
   hud = new HudManager({
     wallet,
+    profile,
     grid,
     unitFactory,
     combat,
@@ -64,7 +67,10 @@ window.addEventListener("DOMContentLoaded", () => {
     },
     onWipeSave: () => {
       wipeSave();
-      wallet.setAether(0);
+      wallet.set("aether", 0);
+      wallet.set("chronium", 0);
+      profile.level = 1;
+      profile.xp = 0;
       grid.matrix = grid.normalizeMatrix(null);
       unitFactory.activeFleet = [];
       unitFactory.queue = [];

@@ -27,7 +27,7 @@ export class UnitFactory {
 
   trainAirship() {
     const unit = UNITS.corsairAirship;
-    if (!this.wallet.spendAether(unit.cost))
+    if (!this.wallet.deduct("aether", unit.cost))
       return { ok: false, message: `Need ${unit.cost} Aether.` };
     this.queue.push({ type: unit.type, remaining: unit.buildTime });
     this.onChange();
